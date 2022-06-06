@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from server.routers import auth_router, rating_router
+from server.routers import auth_router, rating_router, operation_router
 
 app = FastAPI()
 
@@ -16,3 +16,4 @@ app.add_middleware(
 
 app.include_router(auth_router.router, prefix='/auth')
 app.include_router(rating_router.router, prefix='/rating')
+app.include_router(operation_router.router, prefix='/operation')
