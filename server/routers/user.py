@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from server.config.db import conn
+from server.config.db_old import conn
 
 user = APIRouter()
 
