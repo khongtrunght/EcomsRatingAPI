@@ -1,4 +1,4 @@
-import app.server.repositories.rating_repo as rating_repo
+import server.repositories.rating_repo as rating_repo
 from server.schemas.rating import Product
 
 
