@@ -1,6 +1,6 @@
 from fastapi import Depends
 
-from server.config.db_old import database
+from server.config.db import db as database
 
 users_ref = database.users
 
