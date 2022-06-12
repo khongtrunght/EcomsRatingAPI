@@ -12,7 +12,7 @@ settings = Settings()
 
 middleware = [ Middleware(CORSMiddleware, allow_origins=[''], allow_credentials=True, allow_methods=[''], allow_headers=['*'])]
 
-app = FastAPI(middelware = middleware, openapi_url = settings.openapi_url)
+app = FastAPI(middelware = middleware)
 
 app.include_router(auth_router.router, prefix='/auth')
 app.include_router(rating_router.router, prefix='/rating')
