@@ -140,4 +140,7 @@ async def summary_products():
     await fetch_all()
     return result
 
+async def close_db():
+    client.close()
+
 # pprint.pprint(search_product_by_name('chuột'))
