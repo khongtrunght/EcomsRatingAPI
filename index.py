@@ -4,6 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from pydantic import BaseSettings
 from server.routers import auth_router, rating_router, operation_router
+from server.config.db import close_db
 
 class Settings(BaseSettings):
     openapi_url: str = "/openapi.json"
@@ -22,3 +23,5 @@ async def redirect_to_docs():
 app.include_router(auth_router.router, prefix='/auth')
 app.include_router(rating_router.router, prefix='/rating')
 app.include_router(operation_router.router, prefix='/operation')
+
+app.add_event_handler("shutdown", close_db)
