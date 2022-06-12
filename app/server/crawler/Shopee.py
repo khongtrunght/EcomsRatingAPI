@@ -33,7 +33,7 @@ class Shopee(Consumer):
     async def get_rating_list(self, **options: QueryMap):
         rsp = await self.get_rating_list_in(**options)
         data = await rsp.json()
-        if len(data['data']['ratings']) == 0:
+        if data['data']['ratings'] is None or len(data['data']['ratings']) == 0:
             return []
         else:
             return [Rating.parse_obj(item) for item in data['data']['ratings']]
@@ -103,6 +103,7 @@ class ShopeeProcess:
     async def get_ratings_for_product_part(self, itemid, shopid, offset, limit):
         request = self.shopee.get_convert_ratings(itemid, shopid, offset, limit)
         rsp = await self.shopee.get_rating_list(**request)
+        # print(rsp)
         return rsp
 
     async def get_ratings_for_product(self, itemid, shopid):

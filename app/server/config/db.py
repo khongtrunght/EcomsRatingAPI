@@ -5,10 +5,11 @@ import motor.motor_asyncio
 # from products.product import *
 from typing import List, Dict
 import datetime
+from server.schemas.rating import Product
 # import nest_asyncio
 
 # nest_asyncio.apply()
-client = None
+# client = None
 
 conn_str = "mongodb+srv://chau25102001:chau25102001@cluster0.pxxj2.mongodb.net/?retryWrites=true&w=majority"
 # set a 5-second connection timeout
@@ -21,34 +22,32 @@ except Exception:
 db = client.test
 
 
-def insert_one_product(product):
+async def insert_one_product(product):
     # product = locals()
-    product['date'] = datetime.datetime.now()
+    # product.date = datetime.datetime.now()
 
-    async def do_insert():
-        result = await db.products.insert_one(document = product)
-        print('result %s' % repr(result.inserted_id))
-
-    loop = client.get_io_loop()
-    loop.run_until_complete(do_insert())
+    await db.products.insert_one(document = product.dict())
+    # loop = client.get_io_loop()
+    # loop.run_until_complete(do_insert())
 
 
-def insert_many_products(products: List[Dict]):
+
+async def insert_many_products(products: List[Product]):
     for p in products:
-        name = p['name']
-        source = p['source']
-        item_id = p['item_id']
-        shop_id = p['shop_id']
-        reviews = p['reviews']
+        source = p.source
+        item_id = p.item_id
+        shop_id = p.shop_id
 
-        in_DB = check_in_DB(item_id, shop_id, source)
+        in_DB = await check_in_DB(item_id, shop_id, source)
         if not in_DB:
-            insert_one_product(p)
+            await insert_one_product(p)
         else:
             continue
 
+    # return "Alo"
 
-def check_in_DB(item_id: str = None, shop_id: str = None, source: str = None) -> bool:
+
+async def check_in_DB(item_id: str = None, shop_id: str = None, source: str = None) -> bool:
     # assert source in ['tiki', 'lazada', 'shoppee'], "Only support either tiki, lazada, or shoppee"
     assert item_id is not None and source is not None, "At least one of item_id or source must be not None"
 
@@ -58,8 +57,7 @@ def check_in_DB(item_id: str = None, shop_id: str = None, source: str = None) ->
                                             "shop_id": {"$regex": shop_id}})
         return prods
 
-    loop = client.get_io_loop()
-    prods = loop.run_until_complete(fetch_products())
+    prods = await fetch_products()
     if prods is not None:
         return True
     else:
@@ -123,6 +121,7 @@ async def summary_products():
     async def fetch_all():
         prods = db.products.aggregate([
             # {"$unwind": "$reviews"},
+            {"$unset": ["_id"]},
             {"$project": {
                 "name": "$name",
                 "item_id": "$item_id",

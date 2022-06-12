@@ -1,27 +1,28 @@
-from typing import List
+from typing import List, Union, Optional
 from datetime import date
-
+import datetime
 from pydantic import BaseModel, conint, Field, validator
 from pydantic.schema import Dict
 from pydantic.types import constr
 
 
 class Rating(BaseModel):
-    rating: int = 2
+
+    class Config:
+        allow_population_by_field_name = True
+
+    rating: float
     # comment_text: str
-    comment: str
-    images: Union[List, None] = []
-    videos: Union[List, None] = []
+    comment: str = Field(alias='comment_text')
+    images: List = []
+    videos: Union[List] = []
 
-    @validator('images')
-    def check_none(cls, v):
-        if v is None:
+    @validator('images', pre=True)
+    def check_none(value, field):
+        if value is None:
             return []
+        return value
 
-    @validator('rating')
-    def check_contraint(cls, v):
-       if v < 1 or v > 5:
-            return 0
 
 
 
@@ -49,10 +50,11 @@ class Product(BaseModel):
     item_id: str
     shop_id: str
     source: str
-    query_times: int
+    query_times: int = 0
     reviews: List[Rating]
-    available: bool
+    available: bool = True
     avg_rating: float = 0.0
+    date : datetime.datetime = datetime.datetime.now()
 
 class ID(BaseModel):
     source: str
