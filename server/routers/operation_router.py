@@ -20,7 +20,7 @@ async def delete_products(request: Product):
     """
     Delete products by id.
     """
-    return operation_controller.delete_products(request.item_id, request.shop_id, request.source)
+    return await operation_controller.delete_products(request.item_id, request.shop_id, request.source)
 
 
 @router.post("/summary")
@@ -28,7 +28,7 @@ async def summary_all_products():
     """
     Summary all products.
     """
-    return operation_controller.summary_all_products()
+    return await operation_controller.summary_all_products()
 # @router.post("/update/")
 # async def update_database(request: DoByRequest):
 #     """
