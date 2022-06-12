@@ -5,12 +5,12 @@ from pydantic import BaseModel, conint
 from pydantic.types import constr
 
 
-
 class Rating(BaseModel):
-    rating: conint(ge = 0, le = 5) = 2
+    rating: conint(ge=0, le=5) = 2
     comment_text: str
     images: List[str]
     videos: List[str]
+
 
 class Product(BaseModel):
     name: str
