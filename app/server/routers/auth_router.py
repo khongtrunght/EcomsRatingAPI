@@ -18,6 +18,6 @@ async def login(request: OAuth2PasswordRequestForm = Depends()):
 #     return await auth_controller.login(request)
 
 
-@router.post("/create-user")
-async def signup(signup_info: SignupRequest = Depends(get_current_user)):
+@router.post("/create-user", dependencies=[Depends(get_current_user)])
+async def signup(signup_info: SignupRequest ):
     return await auth_controller.create_user(signup_info)
