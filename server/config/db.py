@@ -81,7 +81,7 @@ async def search_product_by_name(name: str, length: int = 5):
     return result
 
 
-def search_products_by_ids(item_id: str, shop_id: str, source: str, length: int = 5):
+async def search_products_by_ids(item_id: str, shop_id: str, source: str, length: int = 5):
     result = []
 
     async def fetch_products():
@@ -96,8 +96,7 @@ def search_products_by_ids(item_id: str, shop_id: str, source: str, length: int 
                                           "$inc": {"query_times": 1}
                                       })
 
-    loop = client.get_io_loop()
-    loop.run_until_complete(fetch_products())
+    await fetch_products()
     return result
 
 
