@@ -22,7 +22,13 @@ class Product(BaseModel):
     available: bool
     avg_rating: float = 0.0
 
+class ID(BaseModel):
+    source: str
+    item_id: str
+    shop_id: str
 
 class DoByRequest(BaseModel):
     input_data: str
     by: constr(regex='^(keyword|url)$') = 'keyword'
+
+

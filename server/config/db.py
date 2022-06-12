@@ -103,17 +103,18 @@ def search_products_by_ids(item_id: str, shop_id: str, source: str, length: int 
     return result
 
 
-def delete_products_by_ids(item_id: str, shop_id: str, source: str):
+async def delete_products_by_ids(item_id: str, shop_id: str, source: str):
     async def delete_products():
-        n = await db.count_documents({})
+        n = await db.products.count_documents({})
         await db.products.delete_many({"source": {"$regex": source, "$options": 'i'},
                                        "item_id": {"$regex": item_id},
                                        "shop_id": {"$regex": shop_id}})
-        print(f"Number of products before deletion: {n}")
-        print(f"Number of products after deletion: {await db.count_documents({})}")
+        return (
+            f"Number of products before deletion: {n}\nNumber of products after deletion: {await db.products.count_documents({})}")
 
-    loop = client.get_io_loop()
-    loop.run_until_complete(delete_products())
+    # loop = client.get_io_loop()
+    # loop.run_until_complete(delete_products())
+    await delete_products()
 
 
 async def summary_products():
@@ -139,6 +140,5 @@ async def summary_products():
     # loop.run_until_complete(fetch_all())
     await fetch_all()
     return result
-
 
 # pprint.pprint(search_product_by_name('chuột'))

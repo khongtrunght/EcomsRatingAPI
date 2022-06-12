@@ -36,12 +36,12 @@ def crawl_by(data: str, by: str):
         crawl_by_url(data)
 
 
-def delete_products(item_id: str, shop_id: str, source: str, by="id"):
+async def delete_products(item_id: str, shop_id: str, source: str, by = "id"):
     assert by == "id", "Only support delete by id"
     if by == 'id':
-        delete_products_by_ids(item_id, shop_id, source)
+        return await delete_products_by_ids(item_id, shop_id, source)
     else:
-        print("Nothing happen!!!")
+        return "Nothing happen!!!"
 
 
 async def summary_all_products():
