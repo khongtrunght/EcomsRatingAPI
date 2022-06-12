@@ -1,4 +1,4 @@
-from app.server.config.db import search_product_by_name
+from server.config.db import search_product_by_name
 import json
 
 async def search_product_by_keyword(keyword):
