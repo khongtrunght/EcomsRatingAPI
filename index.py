@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from pydantic import BaseSettings
@@ -13,6 +13,11 @@ settings = Settings()
 middleware = [ Middleware(CORSMiddleware, allow_origins=[''], allow_credentials=True, allow_methods=[''], allow_headers=['*'])]
 
 app = FastAPI(middelware = middleware)
+
+@app.get("/")
+async def redirect_to_docs():
+    return RedirectResponse("/docs")
+
 
 app.include_router(auth_router.router, prefix='/auth')
 app.include_router(rating_router.router, prefix='/rating')
