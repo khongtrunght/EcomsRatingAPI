@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from pydantic import BaseSettings
-from hust.routers import mark
+from server.routers import auth_router, rating_router, operation_router
 
 class Settings(BaseSettings):
     openapi_url: str = "/openapi.json"
