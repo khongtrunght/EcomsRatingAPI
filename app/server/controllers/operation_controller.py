@@ -1,6 +1,7 @@
 from server.config.db import insert_many_products
 from server.crawler.Shopee import Shopee
 from server.crawler.Tiki import Tiki
+from server.config.db import delete_products_by_ids, summary_products
 
 
 def crawl_by_keyword(keyword: str):
@@ -33,3 +34,15 @@ def crawl_by(data: str, by: str):
         crawl_by_keyword(data)
     elif by == 'url':
         crawl_by_url(data)
+
+
+async def delete_products(item_id: str, shop_id: str, source: str, by = "id"):
+    assert by == "id", "Only support delete by id"
+    if by == 'id':
+        return await delete_products_by_ids(item_id, shop_id, source)
+    else:
+        return "Nothing happen!!!"
+
+
+async def summary_all_products():
+    await summary_products()

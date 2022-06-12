@@ -5,7 +5,9 @@ import motor.motor_asyncio
 # from products.product import *
 from typing import List, Dict
 import datetime
+import nest_asyncio
 
+nest_asyncio.apply()
 client = None
 
 conn_str = "mongodb+srv://chau25102001:chau25102001@cluster0.pxxj2.mongodb.net/?retryWrites=true&w=majority"
@@ -17,9 +19,6 @@ except Exception:
     print("Unable to connect to the server.")
 
 db = client.test
-
-
-# print(r)
 
 
 def insert_one_product(product):
@@ -67,34 +66,79 @@ def check_in_DB(item_id: str = None, shop_id: str = None, source: str = None) ->
         return False
 
 
-async def search_product_by_name(name: str):
+async def search_product_by_name(name: str, length: int = 5):
     assert name is not None and len(name) != 0, "Name cannot be None or empty"
     result = []
 
     async def fetch_products():
         prods = db.products.find({"name": {"$regex": name, "$options": 'i'}}, {'reviews': {"$slice": 5}})
-        for doc in await prods.to_list(length = 100):
+        for doc in await prods.to_list(length = length):
             result.append(doc)
+        await db.products.update_many({"name": {"$regex": name, "$options": 'i'}}, {
+            "$inc": {"query_times": 1}
+        })
 
     # loop = client.get_io_loop()
     await fetch_products()
     return result
 
 
-def search_products_by_ids(item_id: str, shop_id: str, source: str):
+def search_products_by_ids(item_id: str, shop_id: str, source: str, length: int = 5):
     result = []
 
     async def fetch_products():
         prods = db.products.find({"source": {"$regex": source, "$options": 'i'},
                                   "item_id": {"$regex": item_id},
                                   "shop_id": {"$regex": shop_id}}, {'reviews': {"$slice": 5}})
-        for doc in await prods.to_list(length = 100):
+        for doc in await prods.to_list(length = length):
             result.append(doc)
+        await db.products.update_many({"source": {"$regex": source, "$options": 'i'},
+                                       "item_id": {"$regex": item_id},
+                                       "shop_id": {"$regex": shop_id}}, {
+                                          "$inc": {"query_times": 1}
+                                      })
 
     loop = client.get_io_loop()
     loop.run_until_complete(fetch_products())
     return result
 
 
-prods = search_product_by_name("Chuột Không Dây Logitech M221 - Hàng Chính Hãng")
-print(prods)
+async def delete_products_by_ids(item_id: str, shop_id: str, source: str):
+    async def delete_products():
+        n = await db.products.count_documents({})
+        await db.products.delete_many({"source": {"$regex": source, "$options": 'i'},
+                                       "item_id": {"$regex": item_id},
+                                       "shop_id": {"$regex": shop_id}})
+        return (
+            f"Number of products before deletion: {n}\nNumber of products after deletion: {await db.products.count_documents({})}")
+
+    # loop = client.get_io_loop()
+    # loop.run_until_complete(delete_products())
+    await delete_products()
+
+
+async def summary_products():
+    result = []
+
+    async def fetch_all():
+        prods = db.products.aggregate([
+            # {"$unwind": "$reviews"},
+            {"$project": {
+                "name": "$name",
+                "item_id": "$item_id",
+                "shop_id": "$shop_id",
+                "average": {"$avg": "$reviews.rating"},
+                "query_times": "$query_times"
+            }},
+
+        ])
+        for p in await prods.to_list(length = None):
+            result.append(p)
+        return result
+
+    # loop = client.get_io_loop()
+    # loop.run_until_complete(fetch_all())
+    await fetch_all()
+    return result
+
+# pprint.pprint(search_product_by_name('chuột'))
