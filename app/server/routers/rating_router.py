@@ -34,6 +34,5 @@ router = APIRouter(tags=["rating"])
 @router.post("/", response_model=List[Product]) # ,
 async def get_rating_by(request: DoByRequest):
     rsp = await rating_controller.search_product_by(data=request.input_data, by=request.by)
-    return rsp  #Doan nay dang de 1 product vi no lag qua
-
+    return rsp
 
