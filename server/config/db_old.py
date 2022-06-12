@@ -1,7 +1,7 @@
 import motor.motor_asyncio
 from server.schemas.rating import Rating
 
-conn = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
+conn = motor.motor_asyncio.AsyncIOMotorClient('mongodb+srv://chau25102001:chau25102001@cluster0.pxxj2.mongodb.net/?retryWrites=true&w=majority')
 
 database = conn.RatingDB
 

@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List
 from datetime import date
 
 from pydantic import BaseModel, conint, Field, validator
@@ -43,6 +43,7 @@ class TikiRating(BaseModel):
 
 
 
+
 class Product(BaseModel):
     name: str
     item_id: str
@@ -53,6 +54,10 @@ class Product(BaseModel):
     available: bool
     avg_rating: float = 0.0
 
+class ID(BaseModel):
+    source: str
+    item_id: str
+    shop_id: str
 
 class DoByRequest(BaseModel):
     input_data: str
