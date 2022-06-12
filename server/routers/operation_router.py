@@ -14,7 +14,8 @@ async def crawl_by(request: DoByRequest):
     """
     Delete the database.
     """
-    return operation_controller.crawl_by(request.input_data, request.by)
+    await operation_controller.crawl_by(request.input_data, request.by)
+    return {"message": "Crawl by {} successful.".format(request.by)}
 
 
 @router.post("/delete_by_ids", response_model = AnyStr)
@@ -25,7 +26,7 @@ async def delete_products(request: ID):
     return await operation_controller.delete_products(request.item_id, request.shop_id, request.source)
 
 
-@router.post("/summary", response_model = List)
+@router.post("/summary")
 async def summary_all_products():
     """
     Summary all products.

@@ -2,7 +2,6 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
-from server.config.db_old import fetch_all_ratings, fetch_one_rating, create_rating
 from server.schemas.rating import Rating, DoByRequest, Product
 import server.controllers.rating_controller as rating_controller
 
