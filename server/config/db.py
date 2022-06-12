@@ -19,9 +19,6 @@ except Exception:
 db = client.test
 
 
-# print(r)
-
-
 def insert_one_product(product):
     # product = locals()
     product['date'] = datetime.datetime.now()
@@ -104,5 +101,40 @@ def search_products_by_ids(item_id: str, shop_id: str, source: str, length: int 
     return result
 
 
-prods = search_product_by_name("Chuột Không Dây Logitech M221 - Hàng Chính Hãng")
-print(prods)
+def delete_products_by_ids(item_id: str, shop_id: str, source: str):
+    async def delete_products():
+        n = await db.count_documents({})
+        await db.products.delete_many({"source": {"$regex": source, "$options": 'i'},
+                                       "item_id": {"$regex": item_id},
+                                       "shop_id": {"$regex": shop_id}})
+        print(f"Number of products before deletion: {n}")
+        print(f"Number of products after deletion: {await db.count_documents({})}")
+
+    loop = client.get_io_loop()
+    loop.run_until_complete(delete_products())
+
+
+def summary_products():
+    result = []
+
+    async def fetch_all():
+        prods = db.products.aggregate([
+            # {"$unwind": "$reviews"},
+            {"$project": {
+                "name": "$name",
+                "item_id": "$item_id",
+                "shop_id": "$shop_id",
+                "average": {"$avg": "$reviews.rating"},
+                "query_times": "$query_times"
+            }},
+
+        ])
+        for p in await prods.to_list(length = None):
+            result.append(p)
+        return result
+
+    loop = client.get_io_loop()
+    prod = loop.run_until_complete(fetch_all())
+    return prod
+
+
