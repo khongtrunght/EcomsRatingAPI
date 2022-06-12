@@ -139,9 +139,6 @@ class Ecom:
             list_products.extend(results)
         return list_products
 
-    async def search_product_by_url(self, url: str):
-        pass
-
 
 
 
