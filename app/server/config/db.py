@@ -5,9 +5,9 @@ import motor.motor_asyncio
 # from products.product import *
 from typing import List, Dict
 import datetime
-import nest_asyncio
+# import nest_asyncio
 
-nest_asyncio.apply()
+# nest_asyncio.apply()
 client = None
 
 conn_str = "mongodb+srv://chau25102001:chau25102001@cluster0.pxxj2.mongodb.net/?retryWrites=true&w=majority"
