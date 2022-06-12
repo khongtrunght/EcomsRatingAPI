@@ -44,5 +44,5 @@ def delete_products(item_id: str, shop_id: str, source: str, by="id"):
         print("Nothing happen!!!")
 
 
-def summary_all_products():
-    summary_products()
+async def summary_all_products():
+    await summary_products()

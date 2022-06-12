@@ -5,12 +5,14 @@ import motor.motor_asyncio
 # from products.product import *
 from typing import List, Dict
 import datetime
+import nest_asyncio
 
+nest_asyncio.apply()
 client = None
 
 conn_str = "mongodb+srv://chau25102001:chau25102001@cluster0.pxxj2.mongodb.net/?retryWrites=true&w=majority"
 # set a 5-second connection timeout
-client = motor.motor_asyncio.AsyncIOMotorClient(conn_str, serverSelectionTimeoutMS=5000)
+client = motor.motor_asyncio.AsyncIOMotorClient(conn_str, serverSelectionTimeoutMS = 5000)
 try:
     print(client.server_info())
 except Exception:
@@ -24,7 +26,7 @@ def insert_one_product(product):
     product['date'] = datetime.datetime.now()
 
     async def do_insert():
-        result = await db.products.insert_one(document=product)
+        result = await db.products.insert_one(document = product)
         print('result %s' % repr(result.inserted_id))
 
     loop = client.get_io_loop()
@@ -70,7 +72,7 @@ async def search_product_by_name(name: str, length: int = 5):
 
     async def fetch_products():
         prods = db.products.find({"name": {"$regex": name, "$options": 'i'}}, {'reviews': {"$slice": 5}})
-        for doc in await prods.to_list(length=length):
+        for doc in await prods.to_list(length = length):
             result.append(doc)
         await db.products.update_many({"name": {"$regex": name, "$options": 'i'}}, {
             "$inc": {"query_times": 1}
@@ -88,7 +90,7 @@ def search_products_by_ids(item_id: str, shop_id: str, source: str, length: int 
         prods = db.products.find({"source": {"$regex": source, "$options": 'i'},
                                   "item_id": {"$regex": item_id},
                                   "shop_id": {"$regex": shop_id}}, {'reviews': {"$slice": 5}})
-        for doc in await prods.to_list(length=length):
+        for doc in await prods.to_list(length = length):
             result.append(doc)
         await db.products.update_many({"source": {"$regex": source, "$options": 'i'},
                                        "item_id": {"$regex": item_id},
@@ -114,7 +116,7 @@ def delete_products_by_ids(item_id: str, shop_id: str, source: str):
     loop.run_until_complete(delete_products())
 
 
-def summary_products():
+async def summary_products():
     result = []
 
     async def fetch_all():
@@ -129,10 +131,14 @@ def summary_products():
             }},
 
         ])
-        for p in await prods.to_list(length=None):
+        for p in await prods.to_list(length = None):
             result.append(p)
         return result
 
-    loop = client.get_io_loop()
-    prod = loop.run_until_complete(fetch_all())
-    return prod
+    # loop = client.get_io_loop()
+    # loop.run_until_complete(fetch_all())
+    await fetch_all()
+    return result
+
+
+# pprint.pprint(search_product_by_name('chuột'))
