@@ -1,3 +1,4 @@
+import requests
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
@@ -9,6 +10,9 @@ from server.config.db import close_db
 
 class Settings(BaseSettings):
 	openapi_url: str = "/openapi.json"
+
+test = requests.get("https://shopee.vn/api/v4/search/search_items?keyword=macbook%20pro&limit=2")
+print(test.content)
 
 
 settings = Settings()
