@@ -6,18 +6,22 @@ from pydantic import BaseSettings
 from server.routers import auth_router, rating_router, operation_router
 from server.config.db import close_db
 
+
 class Settings(BaseSettings):
-    openapi_url: str = "/openapi.json"
+	openapi_url: str = "/openapi.json"
+
 
 settings = Settings()
 
-middleware = [ Middleware(CORSMiddleware, allow_origins=[''], allow_credentials=True, allow_methods=[''], allow_headers=['*'])]
+middleware = [
+	Middleware(CORSMiddleware, allow_origins=[''], allow_credentials=True, allow_methods=[''], allow_headers=['*'])]
 
-app = FastAPI(middelware = middleware)
+app = FastAPI(middelware=middleware)
+
 
 @app.get("/")
 async def redirect_to_docs():
-    return RedirectResponse("/docs")
+	return RedirectResponse("/docs")
 
 
 app.include_router(auth_router.router, prefix='/auth')
