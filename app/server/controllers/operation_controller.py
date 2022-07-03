@@ -1,9 +1,11 @@
-from server.config.db import insert_many_products
-from server.crawler.Shopee import Shopee, Ecom
+from server.config.db import insert_many_products, insert_one_product
+from server.crawler.Shopee import Shopee
+from server.crawler.Ecom import Ecom
 from server.crawler.Tiki import Tiki
 from server.config.db import delete_products_by_ids, summary_products
 from server.schemas.rating import Product, ShopeeItem
 
+ecom = Ecom()
 
 async def crawl_by_keyword(keyword: str):
     # shopee = Shopee('https://shopee.vn')
@@ -12,7 +14,7 @@ async def crawl_by_keyword(keyword: str):
     # insert_many_products(r1)
     # r2 = tiki.find_reviews_by_keyword(keyword)
     # insert_many_products(r2)
-    ecom = Ecom()
+
     r1 = await ecom.search_product_by_keyword(keyword=keyword, limit=2)
     rsp_products = [
         Product(
@@ -30,27 +32,23 @@ async def crawl_by_keyword(keyword: str):
 
 
 
-def crawl_by_url(url: str):
-    if 'shopee' in url:
-        shopee = Shopee('https://shopee.vn')
-        results = shopee.find_reviews_by_url(url)
-        print(results)
-        # for res in results:
-        insert_many_products(results)
-    elif 'tiki' in url:
-        tiki = Tiki('https://tiki.vn/')
-        results = tiki.find_reviews_by_url(url)
-        print(results)
-        insert_many_products(results)
-    else:
-        print("Nothing happen!!!")
+async def crawl_by_url(url: str):
+    r1 = await ecom.search_product_by_url(url)
+    rsp_product = Product(
+        item_id=r1.itemid,
+        shop_id=r1.shopid,
+        name=r1.name,
+        source='shopee' if isinstance(r1, ShopeeItem) else 'tiki',
+        reviews=r1.ratings,
+    )
+    await insert_one_product(rsp_product)
 
 
 async def crawl_by(data: str, by: str):
     if by == 'keyword':
         return await crawl_by_keyword(data)
     elif by == 'url':
-        return crawl_by_url(data)
+        return await crawl_by_url(data)
 
 
 
