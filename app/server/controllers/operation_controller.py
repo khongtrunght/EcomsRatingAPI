@@ -6,6 +6,7 @@ from server.config.db import delete_products_by_ids, summary_products
 from server.schemas.rating import Product, ShopeeItem
 
 ecom = Ecom()
+NUM_PRODUCT_PER_ECOM = 2
 
 async def crawl_by_keyword(keyword: str):
     # shopee = Shopee('https://shopee.vn')
@@ -15,7 +16,7 @@ async def crawl_by_keyword(keyword: str):
     # r2 = tiki.find_reviews_by_keyword(keyword)
     # insert_many_products(r2)
 
-    r1 = await ecom.search_product_by_keyword(keyword=keyword, limit=2)
+    r1 = await ecom.search_product_by_keyword(keyword=keyword, limit=NUM_PRODUCT_PER_ECOM)
     rsp_products = [
         Product(
             item_id=product.itemid,
@@ -27,7 +28,7 @@ async def crawl_by_keyword(keyword: str):
         for product in r1
     ]
 
-    await insert_many_products(rsp_products)
+    return await insert_many_products(rsp_products)
 
 
 
@@ -41,14 +42,25 @@ async def crawl_by_url(url: str):
         source='shopee' if isinstance(r1, ShopeeItem) else 'tiki',
         reviews=r1.ratings,
     )
-    await insert_one_product(rsp_product)
+    return await insert_one_product(rsp_product)
+
 
 
 async def crawl_by(data: str, by: str):
     if by == 'keyword':
-        return await crawl_by_keyword(data)
+        rsp =  await crawl_by_keyword(data)
+        return {
+            'status': 'success',
+            'num_product_success': rsp['success_count'],
+            'duplicate_db': rsp['total_count'] - rsp['success_count'],
+        }
     elif by == 'url':
-        return await crawl_by_url(data)
+        rsp = await crawl_by_url(data)
+        return {
+            'status': 'success',
+            'num_product_success': 1 if rsp else 0,
+            'duplicate_db': 0 if rsp else 1,
+        }
 
 
 

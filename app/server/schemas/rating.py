@@ -17,11 +17,14 @@ class Rating(BaseModel):
     images: List = []
     videos: Union[List] = []
 
-    @validator('images', pre=True)
-    def check_none(value, field):
-        if value is None:
+    @validator('images', 'videos', pre=True)
+    def check_none(cls, v):
+        if v is None:
             return []
-        return value
+        return v
+
+
+
 
 
 

@@ -9,6 +9,12 @@ async def search_product_by(data, by):
     elif by == 'url':
         products = await rating_repo.search_product_by_url(data)
 
-    rsp = [Product(**product) for product in products]
+    products_list = [Product(**product) for product in products]
+
+    rsp = {
+        'message': f'search by {by} success. Return {len(products_list)} products',
+        'status_code': 200,
+        'data': products_list,
+    }
 
     return rsp
