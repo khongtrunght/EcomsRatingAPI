@@ -11,17 +11,18 @@ class Rating(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    rating: float
+    rating: conint(ge=0, le=5) = Field(alias='rating_star')
     # comment_text: str
     comment: str = Field(alias='comment_text')
     images: List = []
     videos: Union[List] = []
 
-    @validator('images', pre=True)
-    def check_none(value, field):
-        if value is None:
+    @validator('images', 'videos', pre=True)
+    def check_none(cls, v):
+        if v is None:
             return []
-        return value
+        return v
+
 
 
 
@@ -36,7 +37,7 @@ class TikiRating(BaseModel):
         full_path: str
 
     content : str = Field(alias='comment')
-    rating : conint(ge=0, le=5)
+    rating : conint(ge=0, le=5)  #rating la tieu cuc tich cuc, star moi la rating dung
     images : Union[List[Optional[TikiImage]], None] = []
 
 

@@ -30,7 +30,7 @@ router = APIRouter(tags=["rating"])
 #     raise HTTPException(400, "Failed to create rating")
 
 
-@router.post("/", response_model=List[Product]) # ,
+@router.post("/") # ,
 async def get_rating_by(request: DoByRequest):
     rsp = await rating_controller.search_product_by(data=request.input_data, by=request.by)
     return rsp

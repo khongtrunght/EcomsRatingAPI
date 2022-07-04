@@ -14,8 +14,8 @@ async def crawl_by(request: DoByRequest):
     """
     Delete the database.
     """
-    await operation_controller.crawl_by(request.input_data, request.by)
-    return {"message": "Crawl by {} successful.".format(request.by)}
+    return await operation_controller.crawl_by(request.input_data, request.by)
+
 
 
 @router.post("/delete_by_ids", response_model = AnyStr)
