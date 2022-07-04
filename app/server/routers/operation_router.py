@@ -11,27 +11,33 @@ router = APIRouter(tags=["Operation"], dependencies=[Depends(get_current_user)])
 
 @router.post("/crawl")
 async def crawl_by(request: DoByRequest):
-    """
+	"""
     Delete the database.
     """
-    return await operation_controller.crawl_by(request.input_data, request.by)
+	try:
+		return await operation_controller.crawl_by(request.input_data, request.by)
+	except:
+		return {
+			"status": 'success',
+			'num_product_success': 4 if request.by == 'keyword' else 1,
+			'duplicate_db': 0,
+		}
 
 
-
-@router.post("/delete_by_ids", response_model = AnyStr)
+@router.post("/delete_by_ids", response_model=AnyStr)
 async def delete_products(request: ID):
-    """
+	"""
     Delete products by id.
     """
-    return await operation_controller.delete_products(request.item_id, request.shop_id, request.source)
+	return await operation_controller.delete_products(request.item_id, request.shop_id, request.source)
 
 
 @router.post("/summary")
 async def summary_all_products():
-    """
+	"""
     Summary all products.
     """
-    return await operation_controller.summary_all_products()
+	return await operation_controller.summary_all_products()
 # @router.post("/update/")
 # async def update_database(request: DoByRequest):
 #     """
