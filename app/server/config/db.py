@@ -64,13 +64,13 @@ async def check_in_DB(item_id: str = None, shop_id: str = None, source: str = No
         return False
 
 
-async def search_product_by_name(name: str, length: int = 5):
+async def search_product_by_name(name: str,limit: int = 5):
     assert name is not None and len(name) != 0, "Name cannot be None or empty"
     result = []
 
     async def fetch_products():
         prods = db.products.find({"name": {"$regex": name, "$options": 'i'}}, {'reviews': {"$slice": 5}})
-        for doc in await prods.to_list(length = length):
+        for doc in await prods.to_list(length = limit):
             result.append(doc)
         await db.products.update_many({"name": {"$regex": name, "$options": 'i'}}, {
             "$inc": {"query_times": 1}

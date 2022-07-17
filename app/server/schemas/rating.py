@@ -3,7 +3,7 @@ from datetime import date
 import datetime
 from pydantic import BaseModel, conint, Field, validator
 from pydantic.schema import Dict
-from pydantic.types import constr
+from pydantic.types import constr, conint
 
 
 class Rating(BaseModel):
@@ -62,6 +62,7 @@ class ID(BaseModel):
 class DoByRequest(BaseModel):
     input_data: str
     by: constr(regex='^(keyword|url)$') = 'keyword'
+    limit: conint(gt = 0) = 1
 
 
 class ShopeeItemInfo(BaseModel):

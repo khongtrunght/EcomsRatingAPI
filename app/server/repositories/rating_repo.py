@@ -2,11 +2,11 @@ from server.config.db import search_product_by_name, search_products_by_ids
 import re
 import urllib
 
-async def search_product_by_keyword(keyword):
+async def search_product_by_keyword(keyword, limit):
     """
     Search rating by keyword
     """
-    products = await search_product_by_name(keyword)
+    products = await search_product_by_name(keyword, limit)
     return products
     # return [ for product in products]
 

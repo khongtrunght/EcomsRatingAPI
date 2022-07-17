@@ -7,7 +7,7 @@ from server.schemas.rating import Product, ShopeeItem
 
 ecom = Ecom()
 
-async def crawl_by_keyword(keyword: str):
+async def crawl_by_keyword(keyword: str, limit: int):
     # shopee = Shopee('https://shopee.vn')
     # tiki = Tiki('https://tiki.vn/')
     # r1 = shopee.find_reviews_by_keyword(keyword)
@@ -15,7 +15,7 @@ async def crawl_by_keyword(keyword: str):
     # r2 = tiki.find_reviews_by_keyword(keyword)
     # insert_many_products(r2)
 
-    r1 = await ecom.search_product_by_keyword(keyword=keyword, limit=2)
+    r1 = await ecom.search_product_by_keyword(keyword=keyword, limit=limit)
     rsp_products = [
         Product(
             item_id=product.itemid,
@@ -44,9 +44,9 @@ async def crawl_by_url(url: str):
     await insert_one_product(rsp_product)
 
 
-async def crawl_by(data: str, by: str):
+async def crawl_by(data: str, by: str, limit: int):
     if by == 'keyword':
-        return await crawl_by_keyword(data)
+        return await crawl_by_keyword(data, limit)
     elif by == 'url':
         return await crawl_by_url(data)
 
