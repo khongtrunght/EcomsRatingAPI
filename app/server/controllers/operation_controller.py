@@ -4,10 +4,11 @@ from server.crawler.Ecom import Ecom
 from server.crawler.Tiki import Tiki
 from server.config.db import delete_products_by_ids, summary_products
 from server.schemas.rating import Product, ShopeeItem
+import numpy as np
 
 ecom = Ecom()
 
-async def crawl_by_keyword(keyword: str):
+async def crawl_by_keyword(keyword: str, limit: int):
     # shopee = Shopee('https://shopee.vn')
     # tiki = Tiki('https://tiki.vn/')
     # r1 = shopee.find_reviews_by_keyword(keyword)
@@ -15,7 +16,7 @@ async def crawl_by_keyword(keyword: str):
     # r2 = tiki.find_reviews_by_keyword(keyword)
     # insert_many_products(r2)
 
-    r1 = await ecom.search_product_by_keyword(keyword=keyword, limit=2)
+    r1 = await ecom.search_product_by_keyword(keyword=keyword, limit=limit)
     rsp_products = [
         Product(
             item_id=product.itemid,
@@ -23,6 +24,7 @@ async def crawl_by_keyword(keyword: str):
             name=product.name,
             source='shopee' if isinstance(product, ShopeeItem) else 'tiki',
             reviews=product.ratings,
+            avg_rating = np.average([r.rating for r in product.ratings])
         )
         for product in r1
     ]
@@ -40,13 +42,14 @@ async def crawl_by_url(url: str):
         name=r1.name,
         source='shopee' if isinstance(r1, ShopeeItem) else 'tiki',
         reviews=r1.ratings,
+        avg_rating = np.average([r.rating for r in r1.ratings])
     )
     await insert_one_product(rsp_product)
 
 
-async def crawl_by(data: str, by: str):
+async def crawl_by(data: str, by: str, limit: int):
     if by == 'keyword':
-        return await crawl_by_keyword(data)
+        return await crawl_by_keyword(data, limit)
     elif by == 'url':
         return await crawl_by_url(data)
 

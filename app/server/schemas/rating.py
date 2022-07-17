@@ -3,44 +3,36 @@ from datetime import date
 import datetime
 from pydantic import BaseModel, conint, Field, validator
 from pydantic.schema import Dict
-from pydantic.types import constr
+from pydantic.types import constr, conint
 
 
 class Rating(BaseModel):
-
     class Config:
         allow_population_by_field_name = True
 
-    rating: conint(ge=0, le=5) = Field(alias='rating_star')
+    rating: conint(ge = 0, le = 5) = Field(alias = 'rating_star')
     # comment_text: str
-    comment: str = Field(alias='comment_text')
+    comment: str = Field(alias = 'comment_text')
     images: List = []
     videos: Union[List] = []
 
-    @validator('images', pre=True)
+    @validator('images', pre = True)
     def check_none(value, field):
         if value is None:
             return []
         return value
 
 
-
 class TikiRating(BaseModel):
-
     class Config:
         allow_population_by_field_name = True
 
     class TikiImage(BaseModel):
         full_path: str
 
-    content : str = Field(alias='comment')
-    rating : conint(ge=0, le=5)  #rating la tieu cuc tich cuc, star moi la rating dung
-    images : Union[List[Optional[TikiImage]], None] = []
-
-
-
-
-
+    content: str = Field(alias = 'comment')
+    rating: conint(ge = 0, le = 5)  # rating la tieu cuc tich cuc, star moi la rating dung
+    images: Union[List[Optional[TikiImage]], None] = []
 
 
 class Product(BaseModel):
@@ -52,16 +44,19 @@ class Product(BaseModel):
     reviews: List[Rating]
     available: bool = True
     avg_rating: float = 0.0
-    date : datetime.datetime = datetime.datetime.now()
+    date: datetime.datetime = datetime.datetime.now()
+
 
 class ID(BaseModel):
     source: str
     item_id: str
     shop_id: str
 
+
 class DoByRequest(BaseModel):
     input_data: str
-    by: constr(regex='^(keyword|url)$') = 'keyword'
+    by: constr(regex = '^(keyword|url)$') = 'keyword'
+    limit: conint(gt = 0) = 1
 
 
 class ShopeeItemInfo(BaseModel):
@@ -73,6 +68,7 @@ class ShopeeItemInfo(BaseModel):
 class ShopeeItem(BaseModel):
     item_basic: ShopeeItemInfo
     ratings: List[Rating] = []
+
     @property
     def itemid(self):
         return self.item_basic.itemid
@@ -87,7 +83,6 @@ class ShopeeItem(BaseModel):
 
 
 class ShopeeSeachResponse(BaseModel):
-
     items: List[ShopeeItem]
 
 
@@ -100,8 +95,8 @@ class ShopeeRatingResponse(BaseModel):
 
 class TikiItem(BaseModel):
     name: str
-    seller_id: int = Field(alias='shopid')
-    id: int = Field(alias ='itemid')
+    seller_id: int = Field(alias = 'shopid')
+    id: int = Field(alias = 'itemid')
     ratings: List[Rating] = []
 
     @property
@@ -117,7 +112,7 @@ class TikiItem(BaseModel):
 
 
 class TikiSearchResponse(BaseModel):
-    data : List[TikiItem] = Field(alias='items')
+    data: List[TikiItem] = Field(alias = 'items')
 
     @property
     def items(self):

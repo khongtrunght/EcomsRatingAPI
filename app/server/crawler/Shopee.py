@@ -1,11 +1,14 @@
 import re
 
-from uplink import Consumer, get, QueryMap
+from uplink import Consumer, get, QueryMap, returns
 from urllib.parse import unquote
+import requests
 from server.schemas.rating import ShopeeSeachResponse, Rating, ShopeeItem, ShopeeItemInfo
 
 Shopee_url = 'https://shopee.vn'
 keyword_search = 'electrical device'
+
+
 # headers = {'User-Agent': 'Chrome',
 #            'Referer': '{}/search?keyword={}'.format(Shopee_url, keyword_search)
 #            }
@@ -15,12 +18,14 @@ class Shopee(Consumer):
     URL_STR_RE = r"http[s]?://shopee.vn\/(.*)-i\.(\d+)\.(\d+).*"  # 1 ten 2 shopid 3 itemid
     item = "ShopeeItem"
 
+    @returns.from_json(type = ShopeeSeachResponse)
     @get("search/search_items")
-    def search_product_by_keyword(self, **options: QueryMap) -> ShopeeSeachResponse:
+    def search_product_by_keyword(self, **options: QueryMap):
         pass
 
     @get("item/get_ratings")
-    def get_rating_list_in(self, **options: QueryMap )  : # -> ShopeeRatingResponse:   #itemid, shopid, filter, flag, limit, offset
+    def get_rating_list_in(self,
+                           **options: QueryMap):  # -> ShopeeRatingResponse:   #itemid, shopid, filter, flag, limit, offset
         pass
 
     async def get_rating_list(self, **options: QueryMap):
@@ -31,14 +36,13 @@ class Shopee(Consumer):
         else:
             return [Rating.parse_obj(item) for item in data['data']['ratings']]
 
-
     @staticmethod
     def get_convert_products(keyword, limit):
-        return dict(keyword=keyword, limit=limit)
+        return dict(keyword = keyword, limit = limit)
 
     @staticmethod
     def get_convert_ratings(itemid, shopid, offset, limit):
-        return dict(itemid=itemid, shopid=shopid, offset=offset, limit=limit)
+        return dict(itemid = itemid, shopid = shopid, offset = offset, limit = limit)
 
     async def get_product_by_url(self, url):
         match = re.match(self.URL_STR_RE, url)
@@ -48,15 +52,11 @@ class Shopee(Consumer):
             shopid = match.group(2)
             itemid = match.group(3)
 
-            product = ShopeeItem(item_basic=ShopeeItemInfo(name=name, shopid=shopid, itemid=itemid))
-            request = dict(shopid=shopid, itemid=itemid, offset=0, limit=5)
+            product = ShopeeItem(item_basic = ShopeeItemInfo(name = name, shopid = shopid, itemid = itemid))
+            request = dict(shopid = shopid, itemid = itemid, offset = 0, limit = 5)
             rating_list = await self.get_rating_list(**request)
             product.ratings = rating_list
             return product
-
-
-
-
 
 # url = 'https://tiki.vn/api/v2/products?limit={}&include=advertisement&aggregations=2&trackity_id=dbda744c-724c-2c2b-b5e7-1842471a03d6&q={}'.format(
 

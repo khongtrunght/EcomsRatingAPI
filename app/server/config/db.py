@@ -6,6 +6,7 @@ import motor.motor_asyncio
 from typing import List, Dict
 import datetime
 from server.schemas.rating import Product
+
 # import nest_asyncio
 
 # nest_asyncio.apply()
@@ -29,7 +30,6 @@ async def insert_one_product(product):
     await db.products.insert_one(document = product.dict())
     # loop = client.get_io_loop()
     # loop.run_until_complete(do_insert())
-
 
 
 async def insert_many_products(products: List[Product]):
@@ -64,13 +64,13 @@ async def check_in_DB(item_id: str = None, shop_id: str = None, source: str = No
         return False
 
 
-async def search_product_by_name(name: str, length: int = 5):
+async def search_product_by_name(name: str, limit: int = 5):
     assert name is not None and len(name) != 0, "Name cannot be None or empty"
     result = []
 
     async def fetch_products():
         prods = db.products.find({"name": {"$regex": name, "$options": 'i'}}, {'reviews': {"$slice": 5}})
-        for doc in await prods.to_list(length = length):
+        for doc in await prods.to_list(length = limit):
             result.append(doc)
         await db.products.update_many({"name": {"$regex": name, "$options": 'i'}}, {
             "$inc": {"query_times": 1}
@@ -125,7 +125,9 @@ async def summary_products():
                 "name": "$name",
                 "item_id": "$item_id",
                 "shop_id": "$shop_id",
-                "average": {"$avg": "$reviews.rating"},
+                "source": "$source",
+                # "average": {"$avg": "$reviews.rating"},
+                "avg_rating": "$avg_rating",
                 "query_times": "$query_times"
             }},
 
@@ -138,6 +140,7 @@ async def summary_products():
     # loop.run_until_complete(fetch_all())
     await fetch_all()
     return result
+
 
 async def close_db():
     client.close()
