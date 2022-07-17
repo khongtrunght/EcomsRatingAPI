@@ -42,7 +42,7 @@ class Product(BaseModel):
     source: str
     query_times: int = 0
     reviews: List[Rating]
-    available: bool = True
+    # available: bool = True
     avg_rating: float = 0.0
     date: datetime.datetime = datetime.datetime.now()
 
