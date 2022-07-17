@@ -126,8 +126,8 @@ async def summary_products():
                 "item_id": "$item_id",
                 "shop_id": "$shop_id",
                 "source": "$source",
-                "average": {"$avg": "$reviews.rating"},
-                "avg_rating": "$avg_rating",
+                "avg_rating": {"$avg": "$reviews.rating"},
+                # "avg_rating": "$avg_rating",
                 "query_times": "$query_times"
             }},
 
