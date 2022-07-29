@@ -33,9 +33,16 @@ router = APIRouter(tags=["rating"])
 @router.post("/") # ,
 async def get_rating_by(request: DoByRequest):
     rsp = await rating_controller.search_product_by(data=request.input_data, by=request.by, limit = request.limit_per_ecom)
-    return {
-        "status": "success",
-        "status_code": 200,
-        "data": rsp
-    }
+    if len(rsp) != 0:
+        return {
+            "status": "success",
+            "status_code": 200,
+            "data": rsp
+        }
+    else :
+        return {
+            "status": "not found",
+            'status_code': 404,
+            "data": rsp
+        }
 
