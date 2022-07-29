@@ -107,12 +107,17 @@ async def delete_products_by_ids(item_id: str, shop_id: str, source: str):
         await db.products.delete_many({"source": {"$regex": source, "$options": 'i'},
                                        "item_id": {"$regex": item_id},
                                        "shop_id": {"$regex": shop_id}})
-        return (
-            f"Number of products before deletion: {n}\nNumber of products after deletion: {await db.products.count_documents({})}")
+
+        n_after = await db.products.count_documents({})
+        if n_after != n:
+            return (
+                f"Number of products before deletion: {n}\nNumber of products after deletion: {n_after}")
+        else:
+            return ("Nothing happen!!!")
 
     # loop = client.get_io_loop()
     # loop.run_until_complete(delete_products())
-    await delete_products()
+    return await delete_products()
 
 
 async def summary_products():
