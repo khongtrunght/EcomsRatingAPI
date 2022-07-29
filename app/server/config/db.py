@@ -26,23 +26,24 @@ db = client.test
 async def insert_one_product(product):
     # product = locals()
     # product.date = datetime.datetime.now()
-
-    await db.products.insert_one(document = product.dict())
-    # loop = client.get_io_loop()
-    # loop.run_until_complete(do_insert())
+    source = product.source
+    item_id = product.item_id
+    shop_id = product.shop_id
+    in_DB = await check_in_DB(item_id, shop_id, source)
+    if not in_DB:
+        await db.products.insert_one(document=product.dict())
+        return True
+    else:
+        return False
 
 
 async def insert_many_products(products: List[Product]):
+    success_count = 0
     for p in products:
-        source = p.source
-        item_id = p.item_id
-        shop_id = p.shop_id
+        kq = await insert_one_product(p)
+        success_count += 1 if kq else 0
 
-        in_DB = await check_in_DB(item_id, shop_id, source)
-        if not in_DB:
-            await insert_one_product(p)
-        else:
-            continue
+    return dict(success_count=success_count, total_count=len(products))
 
     # return "Alo"
 

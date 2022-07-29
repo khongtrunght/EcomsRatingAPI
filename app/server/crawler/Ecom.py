@@ -52,8 +52,8 @@ class Ecom:
 		self.ecoms_sys = {'shopee': Shopee(base_url='https://shopee.vn/api/v4/', client=uplink.AiohttpClient()),
 						  'tiki': Tiki(base_url='https://tiki.vn/api/v2/', client=uplink.AiohttpClient())}
 
-		self.process = {'tiki': EcomProcess(self.ecoms_sys['tiki']),}
-						# 'shopee': EcomProcess(self.ecoms_sys['shopee'])}
+		self.process = {'tiki': EcomProcess(self.ecoms_sys['tiki']),
+						'shopee': EcomProcess(self.ecoms_sys['shopee'])}
 
 	async def search_product_by_keyword(self, keyword: str, limit: int = 10):
 		list_products = []
@@ -67,6 +67,7 @@ class Ecom:
 
 	async def search_product_by_url(self, url: str):
 		url_re = re.search("http[s]?://([a-z]+).vn.*", url)
+		# url_re = True
 		if url_re:
 			for ecom_name, ecom in self.process.items():
 				if ecom.regex.match(url):

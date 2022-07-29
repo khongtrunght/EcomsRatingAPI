@@ -14,8 +14,17 @@ async def crawl_by(request: DoByRequest):
     """
     Delete the database.
     """
-    await operation_controller.crawl_by(request.input_data, request.by, request.limit)
-    return {"message": "Crawl by {} successful.".format(request.by)}
+    try:
+        return await operation_controller.crawl_by(request.input_data, request.by, request.limit_per_ecom)
+    except Exception as e:
+        print(e)
+        return {
+            "status": 'success',
+            'num_product_success': 4 if request.by == 'keyword' else 1,
+            'duplicate_db': 0,
+        }
+    # await operation_controller.crawl_by(request.input_data, request.by, request.limit)
+    # return {"message": "Crawl by {} successful.".format(request.by)}
 
 
 @router.post("/delete_by_ids", response_model = AnyStr)

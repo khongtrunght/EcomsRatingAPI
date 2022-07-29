@@ -29,7 +29,7 @@ async def crawl_by_keyword(keyword: str, limit: int):
         for product in r1
     ]
 
-    await insert_many_products(rsp_products)
+    return await insert_many_products(rsp_products)
 
 
 
@@ -44,14 +44,24 @@ async def crawl_by_url(url: str):
         reviews=r1.ratings,
         avg_rating = np.average([r.rating for r in r1.ratings])
     )
-    await insert_one_product(rsp_product)
+    return await insert_one_product(rsp_product)
 
 
 async def crawl_by(data: str, by: str, limit: int):
     if by == 'keyword':
-        return await crawl_by_keyword(data, limit)
+        rsp = await crawl_by_keyword(data, limit)
+        return {
+            'status': 'success',
+            'num_product_success': rsp['success_count'],
+            'duplicate_db': rsp['total_count'] - rsp['success_count'],
+        }
     elif by == 'url':
-        return await crawl_by_url(data)
+        rsp = await crawl_by_url(data)
+        return {
+            'status': 'success',
+            'num_product_success': 1 if rsp else 0,
+            'duplicate_db': 0 if rsp else 1,
+        }
 
 
 
